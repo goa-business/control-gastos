@@ -1,0 +1,22 @@
+{
+  "name": "Control de Gastos y Bancos",
+  "short_name": "Gastos y Bancos",
+  "description": "Gastos, bancos y pagos en Bs. y $ desde tu teléfono.",
+  "lang": "es-VE",
+  "start_url": "./app/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1a33",
+  "theme_color": "#0b1a33",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "img/cap-gastos.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow" },
+    { "src": "img/cap-por-pagar.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow" }
+  ]
+}

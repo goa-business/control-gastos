@@ -1,0 +1,47 @@
+name: Fabricar APK y AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['app/**', 'icons/**', 'ci/**', '.github/workflows/apk.yml']
+
+concurrency:
+  group: apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Construir y firmar
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: bash ci/build.sh
+      - name: Guardar AAB para Google Play
+        uses: actions/upload-artifact@v4
+        with:
+          name: Control_de_Gastos_PlayStore_AAB
+          path: Control_de_Gastos_PlayStore.aab
+          retention-days: 60
+      - name: Publicar el APK para descargar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v2.3.${{ github.run_number }}"
+          gh release create "$TAG" Control_de_Gastos.apk \
+            --title "Control de Gastos y Bancos 2.3.${{ github.run_number }}" \
+            --notes "Descarga **Control_de_Gastos.apk** aquí abajo e instálalo en tu Android. Página oficial: https://goa-business.github.io/control-gastos/" \
+            --latest \
+          || gh release upload "$TAG" Control_de_Gastos.apk --clobber
