@@ -24,6 +24,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Verificar conexion con Firebase (referidos)
+        continue-on-error: true
+        run: |
+          KEY=$(grep -o 'AIzaSy[A-Za-z0-9_-]\{33\}' app/index.html | head -1 || true)
+          [ -z "$KEY" ] && KEY="AIzaSyB74m7vrzLxK7epM5WIWCI_rfz7QmbkfgY"
+          R=$(curl -s -w "\nHTTP %{http_code}" -X POST "https://firestore.googleapis.com/v1/projects/control-gastos-ve/databases/(default)/documents:runQuery?key=$KEY" -H "Content-Type: application/json" -d '{"structuredQuery":{"from":[{"collectionId":"referidos"}],"limit":1}}')
+          echo "$R"
+          if echo "$R" | grep -q "HTTP 200"; then echo "### ✅ Firebase conectado (referidos)" >> $GITHUB_STEP_SUMMARY; else echo "### ❌ Firebase NO responde bien" >> $GITHUB_STEP_SUMMARY; echo '```' >> $GITHUB_STEP_SUMMARY; echo "$R" >> $GITHUB_STEP_SUMMARY; echo '```' >> $GITHUB_STEP_SUMMARY; exit 1; fi
       - name: Construir y firmar
         env:
           KS_PASS: ${{ secrets.KS_PASS }}
