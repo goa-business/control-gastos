@@ -47,9 +47,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v2.3.${{ github.run_number }}"
+          TAG="v2.4.${{ github.run_number }}"
           gh release create "$TAG" Control_de_Gastos.apk \
-            --title "Control de Gastos y Bancos 2.3.${{ github.run_number }}" \
+            --title "Control de Gastos y Bancos 2.4.${{ github.run_number }}" \
             --notes "Descarga **Control_de_Gastos.apk** aquí abajo e instálalo en tu Android. Página oficial: https://goa-business.github.io/control-gastos/" \
             --latest \
           || gh release upload "$TAG" Control_de_Gastos.apk --clobber
