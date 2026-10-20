@@ -43,13 +43,17 @@ jobs:
           name: Control_de_Gastos_PlayStore_AAB
           path: Control_de_Gastos_PlayStore.aab
           retention-days: 60
-      - name: Publicar el APK para descargar
+      - name: Publicar el APK (siempre en el mismo lugar)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v2.4.${{ github.run_number }}"
-          gh release create "$TAG" Control_de_Gastos.apk \
-            --title "Control de Gastos y Bancos 2.4.${{ github.run_number }}" \
-            --notes "Descarga **Control_de_Gastos.apk** aquí abajo e instálalo en tu Android. Página oficial: https://goa-business.github.io/control-gastos/" \
-            --latest \
-          || gh release upload "$TAG" Control_de_Gastos.apk --clobber
+          VER="2.5.${{ github.run_number }}"
+          NOTES="Versión $VER. Descarga **Control_de_Gastos.apk** aquí abajo e instálalo encima de la app que ya tienes (toca Actualizar). Página oficial: https://goa-business.github.io/control-gastos/"
+          if gh release view app >/dev/null 2>&1; then
+            gh release upload app Control_de_Gastos.apk --clobber
+            gh release edit app --title "Control de Gastos y Bancos $VER" --notes "$NOTES" --latest
+          else
+            gh release create app Control_de_Gastos.apk --title "Control de Gastos y Bancos $VER" --notes "$NOTES" --latest
+          fi
+          # borrar las versiones viejas para que quede un solo archivo
+          for t in $(gh release list --limit 50 --json tagName --jq '.[].tagName' | grep -v '^app$'); do gh release delete "$t" --yes --cleanup-tag || true; done
