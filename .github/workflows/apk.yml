@@ -55,7 +55,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VER="2.8.${{ github.run_number }}"
+          VER="2.9.${{ github.run_number }}"
           NOTES="Versión $VER. Tasa histórica BCV: ${HIST:-sin verificar}. Descarga **Control_de_Gastos.apk** aquí abajo e instálalo encima de la app que ya tienes (toca Actualizar). Página oficial: https://goa-business.github.io/control-gastos/"
           if gh release view app >/dev/null 2>&1; then
             gh release upload app Control_de_Gastos.apk --clobber
