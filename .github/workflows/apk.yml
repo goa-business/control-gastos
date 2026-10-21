@@ -32,6 +32,14 @@ jobs:
           R=$(curl -s -w "\nHTTP %{http_code}" -X POST "https://firestore.googleapis.com/v1/projects/control-gastos-ve/databases/(default)/documents:runQuery?key=$KEY" -H "Content-Type: application/json" -d '{"structuredQuery":{"from":[{"collectionId":"referidos"}],"limit":1}}')
           echo "$R"
           if echo "$R" | grep -q "HTTP 200"; then echo "### ✅ Firebase conectado (referidos)" >> $GITHUB_STEP_SUMMARY; else echo "### ❌ Firebase NO responde bien" >> $GITHUB_STEP_SUMMARY; echo '```' >> $GITHUB_STEP_SUMMARY; echo "$R" >> $GITHUB_STEP_SUMMARY; echo '```' >> $GITHUB_STEP_SUMMARY; exit 1; fi
+      - name: Verificar tasa BCV histórica (DolarAPI)
+        continue-on-error: true
+        run: |
+          D=$(date -u -d '7 days ago' +%Y/%m/%d)
+          R1=$(curl -s -m 20 "https://ve.dolarapi.com/v1/historicos/dolares/oficial/$D" | head -c 300)
+          R2=$(curl -s -m 20 "https://ve.dolarapi.com/v1/historicos/dolares/oficial" | head -c 300)
+          echo "Por fecha ($D): $R1"; echo "Lista: $R2"
+          if echo "$R1$R2" | grep -q promedio; then echo "HIST=OK" >> $GITHUB_ENV; else echo "HIST=FALLA" >> $GITHUB_ENV; fi
       - name: Construir y firmar
         env:
           KS_PASS: ${{ secrets.KS_PASS }}
@@ -47,8 +55,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VER="2.5.${{ github.run_number }}"
-          NOTES="Versión $VER. Descarga **Control_de_Gastos.apk** aquí abajo e instálalo encima de la app que ya tienes (toca Actualizar). Página oficial: https://goa-business.github.io/control-gastos/"
+          VER="2.6.${{ github.run_number }}"
+          NOTES="Versión $VER. Tasa histórica BCV: ${HIST:-sin verificar}. Descarga **Control_de_Gastos.apk** aquí abajo e instálalo encima de la app que ya tienes (toca Actualizar). Página oficial: https://goa-business.github.io/control-gastos/"
           if gh release view app >/dev/null 2>&1; then
             gh release upload app Control_de_Gastos.apk --clobber
             gh release edit app --title "Control de Gastos y Bancos $VER" --notes "$NOTES" --latest
