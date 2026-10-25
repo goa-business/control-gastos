@@ -26,7 +26,7 @@ s=s.replace('android:allowBackup="true"','android:allowBackup="false"')
 s=s.replace('<uses-permission android:name="android.permission.INTERNET" />','<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />')
 assert 'CAMERA' in s; open(p,"w").write(s)
 p="android/app/build.gradle"; s=open(p).read()
-s=re.sub(r'versionCode \d+','versionCode $((1000 + RUN_NUMBER))',s); s=re.sub(r'versionName "[^"]*"','versionName "3.1.${RUN_NUMBER}"',s)
+s=re.sub(r'versionCode \d+','versionCode $((1000 + RUN_NUMBER))',s); s=re.sub(r'versionName "[^"]*"','versionName "3.2.${RUN_NUMBER}"',s)
 open(p,"w").write(s)
 PY
 pip install --quiet pillow
